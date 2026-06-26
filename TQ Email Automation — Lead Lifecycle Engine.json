@@ -5,13 +5,13 @@
       "parameters": {
         "jsCode": "const CONFIG = {\n  brand:           \"Tech Quarters\",\n  fromName:        \"Marc, Tech Quarters\",\n  fromEmail:       \"onboarding@resend.dev\",\n  replyTo:         \"wmarc2862@gmail.com\",\n  calendarLink:    \"https://cal.com/techquarters/discovery\",\n  meetingLabel:    \"30-min discovery call\",\n  topic:           \"automating your lead follow-up\",\n  offerOneLiner:   \"We'll map out your full email automation system in 30 minutes.\",\n  proofClient:     \"a Dubai-based real estate agency\",\n  proofProblem:    \"leads going cold after the first inquiry\",\n  proofStory:      \"They were losing 60% of leads in the first 48 hours. We set up this exact system and their booked-call rate doubled in three weeks.\",\n  timezone:        \"Asia/Manila\",\n  sendWindowStart: 8,\n  sendWindowEnd:    20,\n  followUp1Seconds:  5,\n  followUp2Seconds:  5,\n  followUp3Seconds:  5,\n  notionDatabaseId: \"f3ddf6e3f5c14a058097f14a9104a1f2?v=6b924ed52a084925af7f2adcb0b3b554\",\n  resendApiKey:     \"re_bX38x9xw_CwsHiqKLt8Dkww2Kds7dM4Qk\"\n};\n\nreturn [{ json: { CONFIG } }];"
       },
-      "id": "9d1de7b0-544c-4313-b976-b07ffc44571d",
+      "id": "b45ade4b-6a2d-4095-b2f7-b9409f62f6d2",
       "name": "BRAND CONFIG (edit here only)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -22832,
-        -832
+        -25712,
+        112
       ]
     },
     {
@@ -21,13 +21,13 @@
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "fc5d4929-7c71-428b-b837-ca5cce7a1c79",
+      "id": "135eaf9e-f4bf-46f7-a8e8-6cafeee135f5",
       "name": "Lead Intake Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -22768,
-        -1104
+        -25648,
+        -160
       ],
       "webhookId": "lead-intake"
     },
@@ -38,13 +38,13 @@
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "a2b4efb5-f1b4-406f-a75f-4940a3c67cd7",
+      "id": "cde0f93d-5ad3-4e7f-9c2d-3506363e8b18",
       "name": "Booking Event Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -22704,
-        -192
+        -25584,
+        752
       ],
       "webhookId": "booking-event"
     },
@@ -54,13 +54,13 @@
         "responseBody": "OK",
         "options": {}
       },
-      "id": "fd666c6c-f803-4d7c-83ff-bca69f2d5d29",
+      "id": "cd031acf-7c9a-4ff1-8e42-843a07b2a369",
       "name": "Respond 200 - Intake",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        -22528,
-        -1168
+        -25408,
+        -224
       ]
     },
     {
@@ -69,26 +69,26 @@
         "responseBody": "OK",
         "options": {}
       },
-      "id": "a11f0d0d-b2ee-4cb6-a22a-e0dca8e65dca",
+      "id": "0ef8c23d-f3f2-4b01-a76f-12d4a8ac9dc4",
       "name": "Respond 200 - Booking",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
-        -22480,
-        -48
+        -25360,
+        896
       ]
     },
     {
       "parameters": {
         "jsCode": "const body   = $('Lead Intake Webhook').first().json.body || $('Lead Intake Webhook').first().json;\nconst config = $('BRAND CONFIG (edit here only)').first().json.CONFIG;\n\nconst lead = {\n  firstName:   body.firstName || body.first_name || body.name?.split(' ')[0] || 'there',\n  lastName:    body.lastName  || body.last_name  || body.name?.split(' ').slice(1).join(' ') || '',\n  email:       (body.email || '').toLowerCase().trim(),\n  phone:       body.phone || body.phone_number || '',\n  source:      body.source || body.utm_source || 'form',\n  createdAt:   new Date().toISOString(),\n  stage:       'New',\n  booked:      false,\n  CONFIG:      config\n};\n\nif (!lead.email) throw new Error('Lead payload missing email — check form field mapping.');\n\nreturn [{ json: lead }];"
       },
-      "id": "011189a0-3a0b-4267-b716-2a6326999ab2",
+      "id": "25a2d38b-c21a-4acb-8d86-844a99ff2c91",
       "name": "Normalise Lead Payload",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -22288,
-        -1104
+        -25168,
+        -160
       ]
     },
     {
@@ -134,13 +134,13 @@
         },
         "options": {}
       },
-      "id": "d221c003-a067-4a89-b2a8-fd0aa6be84de",
+      "id": "7deaa8f5-21a6-45ad-b4f0-8ecd998af71f",
       "name": "CRM - Create Lead Record (Notion)",
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2,
       "position": [
-        -22048,
-        -1104
+        -24928,
+        -160
       ],
       "credentials": {
         "notionOAuth2Api": {
@@ -153,13 +153,13 @@
       "parameters": {
         "jsCode": "// Pull lead from the last node that had it, not from Notion's response\nconst lead   = $('Normalise Lead Payload').first().json;\nconst C      = lead.CONFIG;\nconst pageId = $('CRM - Create Lead Record (Notion)').first().json.id;\n\nconst subject = `We got your request, ${lead.firstName}`;\n\nconst html = `\n<p>Hi ${lead.firstName},</p>\n<p>Thanks for reaching out to <strong>${C.brand}</strong>. ${C.offerOneLiner}</p>\n<p>Quickest next step — grab a time that works for you:<br>\n<a href=\"${C.calendarLink}\">Book your ${C.meetingLabel} →</a></p>\n<p>If the timing isn't right, just reply to this email and let me know.</p>\n<p>${C.fromName}</p>\n`;\n\nreturn [{ json: {\n  to:      lead.email,\n  from:    `${C.fromName} <${C.fromEmail}>`,\n  replyTo: C.replyTo,\n  subject,\n  html,\n  leadPageId: pageId,\n  lead,\n  CONFIG:  C\n}}];"
       },
-      "id": "6fe2c9eb-e5f0-48ce-89f8-13063e01b370",
+      "id": "c002502c-4139-4f42-80c1-af0827b6672d",
       "name": "Build Confirmation Email",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -21808,
-        -1104
+        -24688,
+        -160
       ]
     },
     {
@@ -202,26 +202,27 @@
         },
         "options": {}
       },
-      "id": "0e640ac0-5f18-48f1-874e-8e4a355dd698",
+      "id": "96e7e4bc-2e76-4677-8bb3-46f9317e1453",
       "name": "Send - Confirmation (t=0)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -21568,
-        -1104
+        -24448,
+        -160
       ]
     },
     {
       "parameters": {
-        "amount": "={{ $('BRAND CONFIG (edit here only)').item.json.CONFIG.followUp1Seconds }}"
+        "amount": "={{ $('BRAND CONFIG (edit here only)').item.json.CONFIG.followUp1Seconds }}",
+        "unit": "hours"
       },
-      "id": "d87dc809-8041-453e-adb4-2eb5f70c5188",
+      "id": "267fe36f-dc77-4066-9626-0691d5624b5e",
       "name": "Wait FU1 (config hours)",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        -21328,
-        -1104
+        -24208,
+        -160
       ],
       "webhookId": "10d016fa-737e-4b9e-9d04-b05c6285d9c3"
     },
@@ -248,13 +249,13 @@
         },
         "options": {}
       },
-      "id": "08b306a1-f142-4808-990f-8a9c5a7e0c5f",
+      "id": "61a2bc1e-5009-40d8-bd72-109e0fdd3346",
       "name": "Check Booked? (before FU1)",
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2,
       "position": [
-        -21088,
-        -1104
+        -23968,
+        -160
       ],
       "credentials": {
         "notionOAuth2Api": {
@@ -287,26 +288,26 @@
         },
         "options": {}
       },
-      "id": "c6bfad7a-2b87-4867-b64a-38499ee96a74",
+      "id": "a8d81e52-3380-4262-9548-4df5fb053298",
       "name": "Not booked yet? - FU1",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -20848,
-        -1104
+        -23728,
+        -160
       ]
     },
     {
       "parameters": {
         "jsCode": "const lead   = $('Build Confirmation Email').first().json.lead;\nconst C      = $('Build Confirmation Email').first().json.CONFIG;\n\nconst subject = `Want me to hold a slot, ${lead.firstName}?`;\nconst html = `\n<p>Hi ${lead.firstName},</p>\n<p>I saw you reached out about <strong>${C.topic}</strong> but haven't booked yet — no stress.</p>\n<p>Here's the link again (takes 30 seconds):<br>\n<a href=\"${C.calendarLink}\">Pick a time →</a></p>\n<p>Happy to work around your schedule.</p>\n<p>${C.fromName}</p>\n`;\n\nreturn [{ json: {\n  to:      lead.email,\n  from:    `${C.fromName} <${C.fromEmail}>`,\n  replyTo: C.replyTo,\n  subject,\n  html,\n  lead,\n  CONFIG: C\n}}];"
       },
-      "id": "5f843aa0-77cb-4772-8b44-97c4be7b18af",
+      "id": "8e661694-99b1-4b74-9a3a-e07c48f8f8e2",
       "name": "Build Follow Up 1",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -20608,
-        -1168
+        -23488,
+        -224
       ]
     },
     {
@@ -349,26 +350,27 @@
         },
         "options": {}
       },
-      "id": "2d70f9b5-247d-4e3a-9b61-81c5562efce3",
+      "id": "efea2c15-abc8-4780-a99b-f97dee82fa50",
       "name": "Send - Follow Up 1",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -20368,
-        -1168
+        -23248,
+        -224
       ]
     },
     {
       "parameters": {
-        "amount": "={{ $('BRAND CONFIG (edit here only)').item.json.CONFIG.followUp2Seconds }}"
+        "amount": "={{ $('BRAND CONFIG (edit here only)').item.json.CONFIG.followUp2Seconds }}",
+        "unit": "hours"
       },
-      "id": "d9b42439-e9ca-455b-9c7a-70a3252d91c9",
+      "id": "39b1ab66-6c6a-4fcc-8ff8-6da702445747",
       "name": "Wait FU2 delta",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        -20128,
-        -1168
+        -23008,
+        -224
       ],
       "webhookId": "01df08a8-2e9a-425e-8d5f-5163f0ad5fcb"
     },
@@ -395,13 +397,13 @@
         },
         "options": {}
       },
-      "id": "0c0d0327-ae01-43f4-80cd-5b03e33c076d",
+      "id": "0014c489-c97d-4b95-9cc4-e45a123c2954",
       "name": "Check Booked? (before FU2)",
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2,
       "position": [
-        -19888,
-        -1168
+        -22768,
+        -224
       ],
       "credentials": {
         "notionOAuth2Api": {
@@ -434,26 +436,26 @@
         },
         "options": {}
       },
-      "id": "35bae1d8-6aa5-4f22-a6d6-fb021cba1a85",
+      "id": "5b66e912-e50b-440d-a225-43b7767baf4f",
       "name": "Not booked yet? - FU2",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -19648,
-        -1168
+        -22528,
+        -224
       ]
     },
     {
       "parameters": {
         "jsCode": "const lead   = $('Build Confirmation Email').first().json.lead;\nconst C      = $('Build Confirmation Email').first().json.CONFIG;\n\nconst subject = `How ${C.proofClient} handled ${C.proofProblem}`;\nconst html = `\n<p>Hi ${lead.firstName},</p>\n<p>Quick one: ${C.proofStory}</p>\n<p>Worth a <strong>${C.meetingLabel}</strong> to see if the same applies to you?<br>\n<a href=\"${C.calendarLink}\">Book here →</a></p>\n<p>${C.fromName}</p>\n`;\n\nreturn [{ json: {\n  to:      lead.email,\n  from:    `${C.fromName} <${C.fromEmail}>`,\n  replyTo: C.replyTo,\n  subject,\n  html,\n  lead,\n  CONFIG: C\n}}];"
       },
-      "id": "ff51dff8-2df1-4e77-b840-81bc9c7d8b1f",
+      "id": "a7f70d30-7d87-4bc1-a4cd-7c5dac6075ea",
       "name": "Build Follow Up 2 (proof)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -19408,
-        -1216
+        -22288,
+        -272
       ]
     },
     {
@@ -496,26 +498,27 @@
         },
         "options": {}
       },
-      "id": "f3fe8270-988c-44b6-ae5e-11346590bdba",
+      "id": "62037f28-51b0-4900-8fb6-3ec35bc3bfec",
       "name": "Send - Follow Up 2",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -19168,
-        -1216
+        -22048,
+        -272
       ]
     },
     {
       "parameters": {
-        "amount": "={{ $('BRAND CONFIG (edit here only)').item.json.CONFIG.followUp3Seconds }}"
+        "amount": "={{ $('BRAND CONFIG (edit here only)').item.json.CONFIG.followUp3Seconds }}",
+        "unit": "hours"
       },
-      "id": "0c193dd3-6469-4008-83fc-ecb026e9d3b6",
+      "id": "9fac1610-4126-46e3-98f8-bd670d1eb26a",
       "name": "Wait FU3 delta",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        -18928,
-        -1216
+        -21808,
+        -272
       ],
       "webhookId": "ecda7005-cb4a-452e-8942-8151a21dbc09"
     },
@@ -543,13 +546,13 @@
         },
         "options": {}
       },
-      "id": "7eb1ac72-8330-4439-8d22-ae9f29000f46",
+      "id": "8d0d77ad-809f-4592-9353-a6e7ee302c26",
       "name": "Check Booked? (before FU3)",
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2,
       "position": [
-        -18688,
-        -1216
+        -21568,
+        -272
       ],
       "credentials": {
         "notionOAuth2Api": {
@@ -582,26 +585,26 @@
         },
         "options": {}
       },
-      "id": "03763fe8-5f33-46a0-aa8b-81788b765dee",
+      "id": "6c9c7a7f-5e5d-4ae6-9c70-65bf142d5db2",
       "name": "Not booked yet? - FU3",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -18448,
-        -1216
+        -21328,
+        -272
       ]
     },
     {
       "parameters": {
         "jsCode": "const lead   = $('Build Confirmation Email').first().json.lead;\nconst C      = $('Build Confirmation Email').first().json.CONFIG;\n\nconst subject = `Should I close your file, ${lead.firstName}?`;\nconst html = `\n<p>Hi ${lead.firstName},</p>\n<p>I don't want to keep landing in your inbox if the timing's off.</p>\n<p>If you still want that <strong>${C.meetingLabel}</strong>, the link is here:<br>\n<a href=\"${C.calendarLink}\">Book a time →</a></p>\n<p>Either way — all the best.</p>\n<p>${C.fromName}</p>\n`;\n\nreturn [{ json: {\n  to:      lead.email,\n  from:    `${C.fromName} <${C.fromEmail}>`,\n  replyTo: C.replyTo,\n  subject,\n  html,\n  lead,\n  CONFIG: C\n}}];"
       },
-      "id": "43de3402-acbd-434c-8917-e027adfffe39",
+      "id": "b842167f-b03a-46fc-97e5-f8f5dbd8cbb6",
       "name": "Build Follow Up 3 (breakup)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -18208,
-        -1248
+        -21088,
+        -304
       ]
     },
     {
@@ -644,13 +647,13 @@
         },
         "options": {}
       },
-      "id": "d3b457d5-19b9-4c5e-bf75-a91727327aa7",
+      "id": "a7ae8a82-553f-4830-9161-bd4d8bd041c9",
       "name": "Send - Follow Up 3",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -17968,
-        -1248
+        -20848,
+        -304
       ]
     },
     {
@@ -673,13 +676,13 @@
         },
         "options": {}
       },
-      "id": "81bf2504-1642-40c1-aec2-3c448e8258f8",
+      "id": "089d0398-8d30-4c50-9267-92ffce83c189",
       "name": "CRM - Mark Cold",
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2,
       "position": [
-        -17728,
-        -1248
+        -20608,
+        -304
       ],
       "credentials": {
         "notionOAuth2Api": {
@@ -712,13 +715,13 @@
         },
         "options": {}
       },
-      "id": "07a9ed1a-c1fc-49fb-8fd6-052a2148268a",
+      "id": "40314155-e317-4bf3-8ff9-06b81d1bd4fd",
       "name": "Booked or Cancelled?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -22256,
-        -432
+        -25136,
+        512
       ]
     },
     {
@@ -745,13 +748,13 @@
         },
         "options": {}
       },
-      "id": "56b1103c-b6c2-4b29-95c6-41aeefcd94c7",
+      "id": "280043e3-5d21-429f-a09b-c8dc82378a7d",
       "name": "Find Lead Record (booked)",
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2,
       "position": [
-        -22032,
-        -528
+        -24912,
+        416
       ],
       "credentials": {
         "notionOAuth2Api": {
@@ -784,13 +787,13 @@
         },
         "options": {}
       },
-      "id": "14b7f478-0655-40a1-9ebd-11cea3e05115",
+      "id": "d45be766-baf4-4a9e-8529-235b3b5efff0",
       "name": "CRM - Mark Booked + Suppress",
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2,
       "position": [
-        -21808,
-        -528
+        -24688,
+        416
       ],
       "credentials": {
         "notionOAuth2Api": {
@@ -803,13 +806,13 @@
       "parameters": {
         "jsCode": "const booking   = $('BRAND CONFIG (edit here only)1').first().json;\nconst C         = booking.CONFIG;\nconst record    = $('Find Lead Record (booked)').first().json;\nconst firstName = record.property_first_name || 'there';\n\nconst subject = `You're booked — here's what's next`;\nconst html = `\n<p>Hi ${firstName},</p>\n<p>Your <strong>${C.meetingLabel}</strong> is confirmed.</p>\n<p><strong>When:</strong> ${booking.eventStartTime ? new Date(booking.eventStartTime).toLocaleString('en-GB', { timeZone: C.timezone }) : 'see your calendar invite'}</p>\n<p>You'll get a reminder 24 hours before and again 1 hour before.</p>\n<p>If anything changes, you can reschedule directly from your calendar invite.</p>\n<p>${C.fromName}</p>\n`;\n\nreturn [{ json: {\n  to:             booking.email,\n  from:           `${C.fromName} <${C.fromEmail}>`,\n  replyTo:        C.replyTo,\n  subject,\n  html,\n  CONFIG:         C,\n  eventStartTime: booking.eventStartTime\n}}];"
       },
-      "id": "ecbb9d7f-6966-46d2-a4f9-16fe85a891c1",
+      "id": "3bac2d9b-a982-4180-9fe1-4f736725b19f",
       "name": "Build Booking Confirmation",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -21584,
-        -528
+        -24464,
+        416
       ]
     },
     {
@@ -852,24 +855,27 @@
         },
         "options": {}
       },
-      "id": "06470f64-04a1-4a92-a284-49ed352a92e8",
+      "id": "e7b8dbd1-8a9c-47ee-8d8d-24c6ca6710ca",
       "name": "Send - Booking Confirmation",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -21440,
-        -112
+        -24320,
+        832
       ]
     },
     {
-      "parameters": {},
-      "id": "7e323a0a-ac93-43b9-afd9-d6d23330d26b",
+      "parameters": {
+        "amount": 23,
+        "unit": "hours"
+      },
+      "id": "3c282571-5a10-4f0c-a28b-a9b9942d5983",
       "name": "Wait 23h (24h reminder)",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        -21136,
-        -352
+        -24016,
+        592
       ],
       "webhookId": "c9a7e6a6-9729-4ea7-8e30-956113065750"
     },
@@ -877,13 +883,13 @@
       "parameters": {
         "jsCode": "const prev  = $('Build Booking Confirmation').first().json;\nconst C     = prev.CONFIG;\nconst email = prev.to;\n\nreturn [{ json: {\n  to:      email,\n  from:    `${C.fromName} <${C.fromEmail}>`,\n  replyTo: C.replyTo,\n  subject: `Reminder — your call is tomorrow`,\n  html:    `<p>Just a heads up — your ${C.meetingLabel} is tomorrow. Looking forward to it.</p><p>${C.fromName}</p>`,\n  CONFIG:  C,\n  eventStartTime: prev.eventStartTime\n}}];"
       },
-      "id": "590757ed-36fb-4ba9-9ef2-59f9549b745f",
+      "id": "c4be3277-2b36-4db4-907f-2438bbb140a0",
       "name": "Build 24h Reminder",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -20912,
-        -352
+        -23792,
+        592
       ]
     },
     {
@@ -926,24 +932,27 @@
         },
         "options": {}
       },
-      "id": "3ecc8c7b-5114-44ce-9606-3155861eb95f",
+      "id": "79dd6920-5479-43f0-b8e8-48dc485d0a27",
       "name": "Send - 24h Reminder",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -20688,
-        -352
+        -23568,
+        592
       ]
     },
     {
-      "parameters": {},
-      "id": "46f0171e-c06e-442d-9f0f-842e8f2fecaa",
+      "parameters": {
+        "amount": 23,
+        "unit": "hours"
+      },
+      "id": "c29b2b98-671f-486f-8440-5e91954f0c1b",
       "name": "Wait 23h (1h reminder)",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        -20464,
-        -352
+        -23344,
+        592
       ],
       "webhookId": "7435db97-5df8-430c-bed1-83e889e59d8e"
     },
@@ -951,13 +960,13 @@
       "parameters": {
         "jsCode": "const prev  = $('Build Booking Confirmation').first().json;\nconst C     = prev.CONFIG;\nconst email = prev.to;\n\nreturn [{ json: {\n  to:      email,\n  from:    `${C.fromName} <${C.fromEmail}>`,\n  replyTo: C.replyTo,\n  subject: `Starting in 1 hour — see you soon`,\n  html:    `<p>Your ${C.meetingLabel} starts in about an hour. Talk soon.</p><p>${C.fromName}</p>`,\n  CONFIG:  C\n}}];"
       },
-      "id": "5da4189a-ff7d-497a-9f6a-18c60fd18cac",
+      "id": "3f7bbf1e-1c3f-4c51-ac6e-77c5fba56d23",
       "name": "Build 1h Reminder",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -20240,
-        -352
+        -23120,
+        592
       ]
     },
     {
@@ -1000,13 +1009,13 @@
         },
         "options": {}
       },
-      "id": "10c75c79-9f4d-44aa-9300-e7cd7069b974",
+      "id": "3760676a-e6eb-43be-8aaf-f7bdf7adc348",
       "name": "Send - 1h Reminder",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -20016,
-        -352
+        -22896,
+        592
       ]
     },
     {
@@ -1028,13 +1037,13 @@
         },
         "options": {}
       },
-      "id": "9b98e8b6-b7ae-4716-87a6-5389a1ffd0b7",
+      "id": "f1e9409f-4861-40c0-8db2-638834735cac",
       "name": "Find Lead Record (cancelled)",
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2,
       "position": [
-        -22032,
-        -336
+        -24912,
+        608
       ],
       "credentials": {
         "notionOAuth2Api": {
@@ -1069,13 +1078,13 @@
         },
         "options": {}
       },
-      "id": "50166393-d333-4432-82a4-38af37511894",
+      "id": "8afedf55-53e4-4acf-9154-6580fb299de7",
       "name": "CRM - Mark Cancelled - Re-engage",
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2,
       "position": [
-        -21808,
-        -336
+        -24688,
+        608
       ],
       "credentials": {
         "notionOAuth2Api": {
@@ -1088,13 +1097,13 @@
       "parameters": {
         "jsCode": "const body = $('Booking Event Webhook').first().json.body || $('Booking Event Webhook').first().json;\n\nconst CONFIG = {\n  brand:           \"Tech Quarters\",\n  fromName:        \"Marc, Tech Quarters\",\n  fromEmail:       \"onboarding@resend.dev\",\n  replyTo:         \"wmarc2862@gmail.com\",\n  calendarLink:    \"https://cal.com/techquarters/discovery\",\n  meetingLabel:    \"30-min discovery call\",\n  timezone:        \"Asia/Manila\",\n  notionDatabaseId: \"f3ddf6e3f5c14a058097f14a9104a1f2\",\n  resendApiKey:    \"re_bX38x9xw_CwsHiqKLt8Dkww2Kds7dM4Qk\"\n};\n\nreturn [{ json: {\n  email:          (body.email || body.attendee?.email || '').toLowerCase().trim(),\n  eventType:      body.eventType || body.type || 'booked',\n  eventStartTime: body.eventStartTime || body.startTime || null,\n  CONFIG\n}}];"
       },
-      "id": "7078b0e0-afc8-42cf-bd59-ed38bc296af2",
+      "id": "9dca66ab-190a-48d4-8cae-f5c3fa96084e",
       "name": "BRAND CONFIG (edit here only)1",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -22480,
-        -432
+        -25360,
+        512
       ]
     }
   ],
@@ -1498,7 +1507,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "45f2fc63-ce8d-4d98-b0e7-7568d2444ee9",
+  "versionId": "f5405f1d-c47f-4bb1-8a8c-064df925aba1",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "788538fe94f17a7499d13c3832814c4f357865daba2dc045c44ebb25eb919201"
